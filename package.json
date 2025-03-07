@@ -4,10 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run next\"",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "next" : "next start",
     "server": "node server.js",
     "lint": "next lint"
   },
