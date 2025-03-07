@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import html2canvas from "html2canvas-pro"; // ✅ Use the Pro version
+import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 
 // Custom Button Component
@@ -24,23 +24,27 @@ const Card = ({ children, className }) => (
   </div>
 );
 
-export default function RegistrationConfirm() {
+function RegistrationConfirmContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const printRef = useRef();
 
   useEffect(() => {
-    const userId = searchParams.get("userId"); // Get user ID from URL params
+    const id = searchParams.get("userId");
+    if (id) setUserId(id);
+  }, [searchParams]);
+
+  useEffect(() => {
     if (!userId) {
       setError("No user ID found in the URL.");
       setLoading(false);
       return;
     }
 
-    // Fetch user details from the database
     axios
       .get(`http://localhost:5000/api/user/${userId}`)
       .then((response) => {
@@ -57,16 +61,15 @@ export default function RegistrationConfirm() {
       .finally(() => {
         setLoading(false);
       });
-  }, [router, searchParams]);
+  }, [userId]);
 
   const downloadPDF = async () => {
     const input = printRef.current;
-
     try {
       const canvas = await html2canvas(input, {
-        scale: 3, // Higher scale for better quality
-        useCORS: true, // Supports external images
-        backgroundColor: null, // Keeps transparent background
+        scale: 3,
+        useCORS: true,
+        backgroundColor: null,
       });
 
       const imgData = canvas.toDataURL("image/png");
@@ -124,9 +127,15 @@ export default function RegistrationConfirm() {
             Download PDF
           </Button>
         </div>
-
       </Card>
     </div>
   );
 }
 
+export default function RegistrationConfirm() {
+  return (
+    <Suspense fallback={<p className="text-center text-gray-600 mt-10">Loading page...</p>}>
+      <RegistrationConfirmContent />
+    </Suspense>
+  );
+}
