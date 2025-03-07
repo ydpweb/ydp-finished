@@ -1,4 +1,4 @@
-{
+f{
   "name": "ydp-app",
   "version": "0.1.0",
   "type": "module",
@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node server.js",
+    "start": "next start",
+    "server": "node server.js",
     "lint": "next lint"
   },
   "dependencies": {
